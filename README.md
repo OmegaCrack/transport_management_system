@@ -15,7 +15,7 @@ A comprehensive Transport Management System built with Laravel, designed to mana
 
 - PHP 8.1 or higher
 - Composer
-- MySQL 5.7+ or MariaDB 10.3+
+- Postgres 
 - Node.js & NPM
 - Redis (for queue and caching)
 - Twilio Account (for SMS notifications)
@@ -68,7 +68,7 @@ APP_ENV=local
 APP_DEBUG=true
 APP_URL=http://localhost:8000
 
-DB_CONNECTION=mysql
+DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=transport_management
