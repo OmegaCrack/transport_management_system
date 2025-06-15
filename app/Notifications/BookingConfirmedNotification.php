@@ -8,8 +8,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Notifications\Messages\TwilioSmsMessage;
+use App\Contracts\Notifiable\TwilioSmsNotification as TwilioSmsNotificationContract;
 
-class BookingConfirmedNotification extends Notification implements ShouldQueue
+class BookingConfirmedNotification extends Notification implements ShouldQueue, TwilioSmsNotificationContract
 {
     use Queueable;
 
@@ -28,10 +29,18 @@ class BookingConfirmedNotification extends Notification implements ShouldQueue
      *
      * @return array<int, string>
      */
-    public function via(object $notifiable): array
+    /**
+     * Get the notification's delivery channels.
+     *
+     * @param  mixed  $notifiable
+     * @return array
+     */
+    public function via($notifiable)
     {
         return ['mail', 'twilio'];
     }
+
+
 
     /**
      * Get the mail representation of the notification.
@@ -52,7 +61,7 @@ class BookingConfirmedNotification extends Notification implements ShouldQueue
     /**
      * Get the Twilio / SMS representation of the notification.
      */
-    public function toTwilio($notifiable)
+    public function toTwilio($notifiable): TwilioSmsMessage
     {
         $message = "Booking #{$this->booking->id} confirmed! " .
                  "Route: {$this->booking->route->origin} to {$this->booking->route->destination}. " .
@@ -63,6 +72,17 @@ class BookingConfirmedNotification extends Notification implements ShouldQueue
 
         return (new TwilioSmsMessage())
             ->content($message);
+    }
+    
+    /**
+     * Get the SMS representation of the notification (alias for toTwilio).
+     *
+     * @param  mixed  $notifiable
+     * @return \App\Notifications\Messages\TwilioSmsMessage
+     */
+    public function toSms($notifiable): TwilioSmsMessage
+    {
+        return $this->toTwilio($notifiable);
     }
 
     /**

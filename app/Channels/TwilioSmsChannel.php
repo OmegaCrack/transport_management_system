@@ -3,9 +3,10 @@
 namespace App\Channels;
 
 use Illuminate\Notifications\Notification;
-use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Log;
+use Twilio\Rest\Client;
 use App\Notifications\Messages\TwilioSmsMessage;
+use App\Contracts\Notifiable\TwilioSmsNotification as TwilioSmsNotificationContract;
 
 class TwilioSmsChannel
 {
@@ -40,8 +41,15 @@ class TwilioSmsChannel
      * Send the given notification.
      *
      * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Notifications\Notification|\App\Contracts\Notifiable\TwilioSmsNotification  $notification
      * @return void
+     * @throws \RuntimeException If the notification doesn't implement required methods or returns invalid message type
+     * 
+     * The notification should implement one of the following methods:
+     * - toTwilio($notifiable): TwilioSmsMessage
+     * - toSms($notifiable): TwilioSmsMessage
+     * 
+     * It's recommended to implement the TwilioSmsNotification interface.
      */
     public function send($notifiable, Notification $notification)
     {
@@ -49,10 +57,24 @@ class TwilioSmsChannel
             return;
         }
 
-        // Dynamically call the appropriate method on the notification
-        $message = method_exists($notification, 'toTwilio')
-            ? $notification->toTwilio($notifiable)
-            : $notification->toSms($notifiable);
+        // Get the message from the notification
+        if (method_exists($notification, 'toTwilio')) {
+            $message = $notification->toTwilio($notifiable);
+        } elseif (method_exists($notification, 'toSms')) {
+            $message = $notification->toSms($notifiable);
+        } else {
+            $notificationClass = get_class($notification);
+            throw new \RuntimeException(
+                "Notification [{$notificationClass}] is missing required method [toTwilio] or [toSms]"
+            );
+        }
+
+        if (!($message instanceof \App\Notifications\Messages\TwilioSmsMessage)) {
+            $messageType = is_object($message) ? get_class($message) : gettype($message);
+            throw new \RuntimeException(
+                "Notification must return a TwilioSmsMessage instance, got [{$messageType}]"
+            );
+        }
 
         try {
             $this->twilio->messages->create($to, [

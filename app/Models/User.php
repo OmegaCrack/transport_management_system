@@ -53,10 +53,11 @@ class User extends Authenticatable
      * Route notifications for the Twilio channel.
      *
      * @param  \Illuminate\Notifications\Notification  $notification
-     * @return string
+     * @return string|null
      */
     public function routeNotificationForTwilio($notification)
     {
+        // Return the phone number associated with the user
         return $this->phone_number;
     }
 }
