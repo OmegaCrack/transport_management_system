@@ -134,7 +134,7 @@ return [
     */
     'providers' => [
         // ... Other Service Providers
-        \App\Providers\TwilioServiceProvider::class,
+        App\Providers\AfricasTalkingServiceProvider::class,
     ],
 
 ];

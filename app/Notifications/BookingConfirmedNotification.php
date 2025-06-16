@@ -7,10 +7,10 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use App\Notifications\Messages\TwilioSmsMessage;
-use App\Contracts\Notifiable\TwilioSmsNotification as TwilioSmsNotificationContract;
+use App\Notifications\Messages\AfricasTalkingSmsMessage;
+use App\Contracts\Notifiable\AfricasTalkingSmsNotification;
 
-class BookingConfirmedNotification extends Notification implements ShouldQueue, TwilioSmsNotificationContract
+class BookingConfirmedNotification extends Notification implements ShouldQueue, AfricasTalkingSmsNotification
 {
     use Queueable;
 
@@ -35,9 +35,15 @@ class BookingConfirmedNotification extends Notification implements ShouldQueue, 
      * @param  mixed  $notifiable
      * @return array
      */
+    /**
+     * Get the notification's delivery channels.
+     *
+     * @param  mixed  $notifiable
+     * @return array
+     */
     public function via($notifiable)
     {
-        return ['mail', 'twilio'];
+        return ['mail', 'africas_talking'];
     }
 
 
@@ -59,30 +65,41 @@ class BookingConfirmedNotification extends Notification implements ShouldQueue, 
     }
 
     /**
-     * Get the Twilio / SMS representation of the notification.
+     * Get the Africa's Talking / SMS representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return \App\Notifications\Messages\AfricasTalkingSmsMessage
      */
-    public function toTwilio($notifiable): TwilioSmsMessage
+    public function toAfricasTalking($notifiable): AfricasTalkingSmsMessage
     {
         $message = "Booking #{$this->booking->id} confirmed! " .
                  "Route: {$this->booking->route->origin} to {$this->booking->route->destination}. " .
-                 "Date: {$this->booking->departure_time->format('M d, Y H:i')}. " .
-                 "Passengers: {$this->booking->passengers}. " .
+                 "Date: {$this->booking->travel_date->format('M d, Y')}. " .
+                 "Seats: {$this->booking->seat_count}. " .
                  "Total: KES " . number_format($this->booking->total_fare, 2) . ". " .
                  "Thank you!";
 
-        return (new TwilioSmsMessage())
+        return (new AfricasTalkingSmsMessage())
             ->content($message);
     }
-    
+
     /**
-     * Get the SMS representation of the notification (alias for toTwilio).
+     * Get the SMS representation of the notification.
+     * Alias for toAfricasTalking for backward compatibility.
      *
      * @param  mixed  $notifiable
-     * @return \App\Notifications\Messages\TwilioSmsMessage
+     * @return \App\Notifications\Messages\AfricasTalkingSmsMessage
      */
-    public function toSms($notifiable): TwilioSmsMessage
+    /**
+     * Get the SMS representation of the notification.
+     * Alias for toAfricasTalking for backward compatibility.
+     *
+     * @param  mixed  $notifiable
+     * @return \App\Notifications\Messages\AfricasTalkingSmsMessage
+     */
+    public function toSms($notifiable): AfricasTalkingSmsMessage
     {
-        return $this->toTwilio($notifiable);
+        return $this->toAfricasTalking($notifiable);
     }
 
     /**

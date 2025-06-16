@@ -18,7 +18,7 @@ A comprehensive Transport Management System built with Laravel, designed to mana
 - Postgres 
 - Node.js & NPM
 - Redis (for queue and caching)
-- Twilio Account (for SMS notifications)
+- Africa's Talking API credentials (for SMS notifications)
 
 ## 🛠 Installation
 
@@ -84,9 +84,10 @@ MAIL_ENCRYPTION=null
 MAIL_FROM_ADDRESS="hello@example.com"
 MAIL_FROM_NAME="${APP_NAME}"
 
-TWILIO_SID=your_twilio_sid
-TWILIO_AUTH_TOKEN=your_twilio_auth_token
-TWILIO_FROM=your_twilio_phone_number
+AFRICASTALKING_USERNAME=your_africastalking_username
+AFRICASTALKING_API_KEY=your_africastalking_api_key
+AFRICASTALKING_SENDER_ID=your_sender_id
+AFRICASTALKING_ENV=sandbox # or production
 ```
 
 ## 📱 Notifications
@@ -97,10 +98,11 @@ The system sends notifications via both email and SMS for important events like 
 
 To enable SMS notifications:
 
-1. Sign up for a [Twilio](https://www.twilio.com/) account
-2. Get your Account SID and Auth Token
-3. Update your `.env` file with Twilio credentials
-4. Ensure users have a valid phone number in their profile
+1. Sign up for an [Africa's Talking](https://africastalking.com/) account
+2. Get your API username and API key from the dashboard
+3. Update your `.env` file with Africa's Talking credentials
+4. Set up your sender ID in the Africa's Talking dashboard
+5. Ensure users have a valid phone number in their profile (with country code, e.g., +2547XXXXXXXX)
 
 ### Email Notifications
 
@@ -149,5 +151,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - [Laravel](https://laravel.com/)
-- [Twilio](https://www.twilio.com/)
+- [Africa's Talking](https://africastalking.com/)
 - All contributors who have helped shape this project
